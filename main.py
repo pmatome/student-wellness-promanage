@@ -84,7 +84,7 @@ def open_dashboard():
 
     tk.Button(tab_session, text="Save Record", command=submit_session, bg="#2196F3", fg="white").place(x=150, y=250)
 
-    # TAB 3: View Records
+      # TAB 3: View Records
     tab_records = ttk.Frame(notebook)
     notebook.add(tab_records, text="View Reports")
 
@@ -102,7 +102,20 @@ def open_dashboard():
         for record in records:
             tree.insert("", tk.END, values=record)
 
-    tk.Button(tab_records, text="Refresh Data", command=load_records).pack(pady=5)
+    def export_data():
+        success, msg = services.export_records_to_csv()
+        if success:
+            messagebox.showinfo("Export Successful", msg)
+        else:
+            if msg != "Export cancelled.":
+                messagebox.showerror("Export Failed", msg)
+
+    # Frame for buttons at the bottom of the tab
+    btn_frame = tk.Frame(tab_records)
+    btn_frame.pack(pady=10)
+
+    tk.Button(btn_frame, text="Refresh Data", command=load_records, bg="#003366", fg="white").pack(side=tk.LEFT, padx=10)
+    tk.Button(btn_frame, text="Export to CSV", command=export_data, bg="#4CAF50", fg="white").pack(side=tk.LEFT, padx=10)
 
     root.mainloop()
 
