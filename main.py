@@ -185,7 +185,7 @@ def open_dashboard():
 
     root.mainloop()
 
-    # ==========================================
+        # ==========================================
     # TAB 4: Manage Students (Search & Delete)
     # ==========================================
     tab_manage = ttk.Frame(notebook, padding=20)
@@ -206,25 +206,29 @@ def open_dashboard():
     manage_tree.pack(fill="both", expand=True, pady=10)
 
     def load_students(query=""):
+        # Clear existing data in table
         for row in manage_tree.get_children():
             manage_tree.delete(row)
-        # (In a real app, you would add a search function in clients.py. For now, we just load all)
-        students = clients.get_all_students() 
+            
+        students = clients.get_all_students()
+        
+        # Filter based on search query
         for student in students:
-            manage_tree.insert("", tk.END, values=student)
+            # student is a tuple: (student_id, name, email, department)
+            if query.lower() in str(student).lower():
+                manage_tree.insert("", tk.END, values=student)
 
-    def delete_student():
+    def delete_selected_student():
         selected = manage_tree.selection()
         if not selected:
             messagebox.showwarning("Warning", "Please select a student to delete.")
             return
         
-        # Get the Student ID from the selected row
+        # Get the Student ID from the selected row (index 0 is the ID)
         student_id = manage_tree.item(selected[0])['values'][0]
         confirm = messagebox.askyesno("Confirm", f"Are you sure you want to delete Student {student_id}?")
         
         if confirm:
-            # We need a delete function in clients.py!
             success, msg = clients.delete_student(student_id)
             if success:
                 messagebox.showinfo("Success", msg)
@@ -232,8 +236,12 @@ def open_dashboard():
             else:
                 messagebox.showerror("Error", msg)
 
+    # Add the buttons and link them to the functions
     ttk.Button(search_frame, text="Search", command=lambda: load_students(ent_search.get())).pack(side=tk.LEFT, padx=5)
-    ttk.Button(tab_manage, text="Delete Selected Student", command=delete_student).pack(pady=5)
+    ttk.Button(tab_manage, text="Delete Selected Student", command=delete_selected_student).pack(pady=5)
+
+    # IMPORTANT: Load the students when the app first opens!
+    load_students()
 
     # ==========================================
     # TAB 5: Settings (Add Counselors & Services)
