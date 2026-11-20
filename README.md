@@ -38,19 +38,19 @@ Make sure you have Python installed on your computer. You can download it from [
    python main.py
 
  Default Login
- Username: admin
+Username: admin
 
- Password: admin123
+Password: admin123
 
  Project Structure
 text
-├── main.py           # Presentation Layer (GUI, Tabs, Login)
-├── database.py       # Database setup, connection, and password hashing
-├── clients.py        # Logic for registering and deleting students
-├── services.py       # Logic for logging counseling sessions
-├── reports.py        # Logic for fetching and exporting data to CSV
-├── .gitignore        # Prevents database and cache files from being uploaded
-└── README.md         # Project documentation
+├─ main.py           # Presentation Layer (GUI, Tabs, Login)
+├─ database.py       # Database setup, connection, and password hashing
+├─ clients.py        # Logic for registering and deleting students
+├─ services.py       # Logic for logging counseling sessions
+├─ reports.py        # Logic for fetching and exporting data to CSV
+├─ .gitignore        # Prevents database and cache files from being uploaded
+└─ README.md         # Project documentation
 
 
 
