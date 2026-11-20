@@ -17,3 +17,11 @@ def register_student(student_id, name, email, department):
         return False, "Error: Student ID might already exist."
     finally:
         conn.close()
+
+def delete_student(student_id):
+    conn = database.create_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM students WHERE student_id = ?", (student_id,))
+    conn.commit()
+    conn.close()
+    return True, f"Student {student_id} deleted successfully."
