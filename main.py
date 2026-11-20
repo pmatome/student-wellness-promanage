@@ -185,6 +185,104 @@ def open_dashboard():
 
     root.mainloop()
 
+    # ==========================================
+    # TAB 4: Manage Students (Search & Delete)
+    # ==========================================
+    tab_manage = ttk.Frame(notebook, padding=20)
+    notebook.add(tab_manage, text="Manage Students")
+
+    tk.Label(tab_manage, text="Search by Student ID or Name:", font=("Arial", 11)).pack(pady=5)
+    
+    search_frame = tk.Frame(tab_manage)
+    search_frame.pack(pady=5)
+    ent_search = ttk.Entry(search_frame, width=30)
+    ent_search.pack(side=tk.LEFT, padx=5)
+
+    manage_columns = ("Student ID", "Name", "Email", "Department")
+    manage_tree = ttk.Treeview(tab_manage, columns=manage_columns, show="headings")
+    for col in manage_columns:
+        manage_tree.heading(col, text=col)
+        manage_tree.column(col, width=150, anchor="center")
+    manage_tree.pack(fill="both", expand=True, pady=10)
+
+    def load_students(query=""):
+        for row in manage_tree.get_children():
+            manage_tree.delete(row)
+        # (In a real app, you would add a search function in clients.py. For now, we just load all)
+        students = clients.get_all_students() 
+        for student in students:
+            manage_tree.insert("", tk.END, values=student)
+
+    def delete_student():
+        selected = manage_tree.selection()
+        if not selected:
+            messagebox.showwarning("Warning", "Please select a student to delete.")
+            return
+        
+        # Get the Student ID from the selected row
+        student_id = manage_tree.item(selected[0])['values'][0]
+        confirm = messagebox.askyesno("Confirm", f"Are you sure you want to delete Student {student_id}?")
+        
+        if confirm:
+            # We need a delete function in clients.py!
+            success, msg = clients.delete_student(student_id)
+            if success:
+                messagebox.showinfo("Success", msg)
+                load_students() # Refresh table
+            else:
+                messagebox.showerror("Error", msg)
+
+    ttk.Button(search_frame, text="Search", command=lambda: load_students(ent_search.get())).pack(side=tk.LEFT, padx=5)
+    ttk.Button(tab_manage, text="Delete Selected Student", command=delete_student).pack(pady=5)
+
+    # ==========================================
+    # TAB 5: Settings (Add Counselors & Services)
+    # ==========================================
+    tab_settings = ttk.Frame(notebook, padding=20)
+    notebook.add(tab_settings, text="Settings")
+
+    tk.Label(tab_settings, text="Add New Counselor:", font=("Arial", 12, "bold")).pack(pady=(10, 5))
+    ent_new_counselor = ttk.Entry(tab_settings, width=30)
+    ent_new_counselor.pack(pady=5)
+
+    def add_counselor():
+        name = ent_new_counselor.get().strip()
+        if name:
+            conn = database.create_connection()
+            cursor = conn.cursor()
+            try:
+                cursor.execute("INSERT INTO counselors (name) VALUES (?)", (name,))
+                conn.commit()
+                messagebox.showinfo("Success", f"Counselor {name} added!")
+                ent_new_counselor.delete(0, tk.END)
+            except:
+                messagebox.showerror("Error", "Counselor already exists.")
+            finally:
+                conn.close()
+
+    ttk.Button(tab_settings, text="Add Counselor", command=add_counselor).pack(pady=5)
+
+    tk.Label(tab_settings, text="Add New Service:", font=("Arial", 12, "bold")).pack(pady=(20, 5))
+    ent_new_service = ttk.Entry(tab_settings, width=30)
+    ent_new_service.pack(pady=5)
+
+    def add_service():
+        name = ent_new_service.get().strip()
+        if name:
+            conn = database.create_connection()
+            cursor = conn.cursor()
+            try:
+                cursor.execute("INSERT INTO services (service_name) VALUES (?)", (name,))
+                conn.commit()
+                messagebox.showinfo("Success", f"Service {name} added!")
+                ent_new_service.delete(0, tk.END)
+            except:
+                messagebox.showerror("Error", "Service already exists.")
+            finally:
+                conn.close()
+
+    ttk.Button(tab_settings, text="Add Service", command=add_service).pack(pady=5)
+
 # --- START APP ---
 if __name__ == "__main__":
     database.setup_database() # Ensure DB is ready
