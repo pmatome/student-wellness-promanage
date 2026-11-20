@@ -18,6 +18,14 @@ def register_student(student_id, name, email, department):
     finally:
         conn.close()
 
+def get_all_students():
+    conn = database.create_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT student_id, name, email, department FROM students")
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
 def delete_student(student_id):
     conn = database.create_connection()
     cursor = conn.cursor()
